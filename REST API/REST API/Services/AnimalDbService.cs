@@ -75,11 +75,38 @@ public class AnimalDbService : IAnimalDbService
 
         public async Task<int> UpdateAnimal(Animal animal, int idAnimal)
         {
-            throw new NotImplementedException();
+            string sql = "UPDATE Animal SET Name = @name, Description = @description, " +
+                         "Category = @category, Area = @area WHERE IdAnimal = @idAnimal";
+
+            await using SqlConnection sqlConnection = new(_connString);
+            await using SqlCommand sqlCommand = new(sql, sqlConnection);
+
+            await sqlConnection.OpenAsync();
+
+            sqlCommand.Parameters.AddWithValue("@name", animal.Name);
+            sqlCommand.Parameters.AddWithValue("@description", animal.Description);
+            sqlCommand.Parameters.AddWithValue("@category", animal.Category);
+            sqlCommand.Parameters.AddWithValue("@area", animal.Area);
+            sqlCommand.Parameters.AddWithValue("@idAnimal", idAnimal);
+
+            int result = await sqlCommand.ExecuteNonQueryAsync();
+            await sqlConnection.CloseAsync();
+
+            return result;
         }
 
         public async Task<int> DeleteAnimal(int idAnimal)
         {
-            throw new NotImplementedException();
+            string sql = "DELETE FROM Animal WHERE IdAnimal = @idAnimal";
+
+            await using SqlConnection sqlConnection = new(_connString);
+            await using SqlCommand sqlCommand = new(sql, sqlConnection);
+            sqlCommand.Parameters.AddWithValue("@idAnimal", idAnimal);
+            await sqlConnection.OpenAsync();
+
+            int result = await sqlCommand.ExecuteNonQueryAsync();
+            await sqlConnection.CloseAsync();
+
+            return result;
         }
     }
